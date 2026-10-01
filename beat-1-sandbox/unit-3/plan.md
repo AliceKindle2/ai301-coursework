@@ -22,3 +22,7 @@ Not in scope: `ReadmeScorer`'s word-counting or categorization logic (`agent/too
 
 1. Open `tests/unit/test_readme_scorer.py` and locate the fixture README string inside `test_readme_with_all_quality_signals` (the string currently totaling 51 words, structured as a project title, description, Installation, Usage, Features, Tech Stack, badges, and Live Demo sections).
 2. Add 2-4 additional sentences
+
+## Deviations
+
+Nothing changed from the plan. The fixture was expanded with additional prose in each existing section, and the xfail marker was removed, exactly as planned. One adjustment: the initial prose addition only reached ~220 words (passing the >100 assertion but landing in the "adequate" category rather than "comprehensive"), since I hadn't checked the exact category thresholds (100–500 = adequate, >500 = comprehensive) before writing the first draft. I added a further "Additional Notes" section to push the total past 500 words, after which the test passed exactly as planned.
