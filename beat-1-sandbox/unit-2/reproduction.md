@@ -66,3 +66,43 @@ Running my skill live on my actual claim-only draft showed a real limitation of 
 
 Related paths: `eval-run.txt` in this directory; your skill's files in
 `tools/repro-check/`.
+
+**Reproduction comment**
+
+https://github.com/codepath/pathreview-ai301-fa26-s1/issues/63#issuecomment-5922826062
+
+Environment
+OS: Windows 11
+Python: 3.14.4
+pytest: 9.1.1
+Repo: Fork of codepath/pathreview-ai301-fa26-s1, branch main
+Setup: Created a Python venv per docs/SETUP.md, activated it, and ran pip install -e ".[dev]". Skipped the full make setup, since this bug is isolated to a Python unit test with no database or API dependency
+
+Steps
+cd into the cloned fork
+py -m venv .venv
+source .venv/Scripts/activate
+pip install -e ".[dev]"
+pytest tests/unit/test_readme_scorer.py -v -m unit
+
+Behavior shown
+Test output:
+tests/unit/test_readme_scorer.py::TestReadmeScorer::test_readme_with_all_quality_signals XFAIL
+22 passed, 1 xfailed in 2.84s
+
+The test carries this marker:
+@pytest.mark.xfail(strict=True, reason="issue #63: README scorer fixture is too short for its own word-count assertion")
+
+I confirmed the fixture's actual word count directly:
+$ python /tmp/count_words.py
+51
+
+This matches the issue's stated assert 51 > 100 exactly. The assertions that would fail without the xfail marker are assert data["word_count"] > 100 and assert data["word_count_category"] == "comprehensive"
+
+Expected vs actual
+Expected: The fixture's word count should exceed 100, so the test validates comprehensive README scoring as intended.
+Actual: The fixture contains exactly 51 words, so assert data["word_count"] > 100 would fail.
+
+A maintainer has already marked the test xfail(strict=True) citing this issue, so the suite reports 22 passed, 1 xfailed rather than a plain failure.
+
+Next, I will extend the fixture's content past 100 words and remove the xfail marker, since strict=True means an unexpected pass after the fix would itself cause a failure.
